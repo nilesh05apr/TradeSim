@@ -50,7 +50,7 @@ make
 
 ## Project Structure
 ```shell
-ExchangeSim/
+TradeSim/
 |-- Utils/
 |   |-- Utils.h
 |   |-- Utils.cpp
