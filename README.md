@@ -64,7 +64,7 @@ ExchangeSim/
 |   |-- MatchOrder.cpp
 |-- OrderBook/
 |   |-- OrderBook.h
-|   -- OrderBook.cpp
+|   |-- OrderBook.cpp
 |-- Stock/
 |   |-- Stock.h
 |   |-- Stock.cpp
