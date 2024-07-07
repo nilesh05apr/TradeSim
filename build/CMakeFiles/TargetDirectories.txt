@@ -1,0 +1,3 @@
+/home/nilesh/projects/TradeSim/build/CMakeFiles/TradeSim.dir
+/home/nilesh/projects/TradeSim/build/CMakeFiles/edit_cache.dir
+/home/nilesh/projects/TradeSim/build/CMakeFiles/rebuild_cache.dir
