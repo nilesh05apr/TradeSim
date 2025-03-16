@@ -19,13 +19,15 @@ const std::string& Stock::getSymbol() const { return symbol_; }
 const std::string& Stock::getName() const { return name_; }
 double Stock::getCurrentMarketPrice() const { return currentMarketPrice_; }
 int Stock::getAvailableShares() const { return availableShares_; }
+// std::shared_ptr<OrderBook::OrderBook> Stock::getOrderBook() const { return orderBooks_; }
+// OrderBook::OrderBook Stock::getOrderBook() const { return orderBooks_; }
 
 void Stock::addOrder(const Order::Order& order) {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (orderBooks_.find(order.id) == orderBooks_.end()) {
-        orderBooks_[order.id] = std::make_unique<OrderBook::OrderBook>();
-    }
-    orderBooks_[order.id]->addOrder(order);
+    // if (orderBooks_.find(order.id) == orderBooks_.end()) {
+    //     orderBooks_[order.id] = std::make_unique<OrderBook::OrderBook>();
+    // }
+    // orderBooks_[order.id]->addOrder(order);
+    orderBooks_.addOrder(order);
     Utils::Logger::getInstance().log("Order added: " + boost::uuids::to_string(order.id) + 
                                      " Type: " + Utils::toString(order.type) +
                                      " Price: " + std::to_string(order.price) + 
@@ -33,36 +35,39 @@ void Stock::addOrder(const Order::Order& order) {
 }
 
 void Stock::cancelOrder(const boost::uuids::uuid& orderId) {
-    std::lock_guard<std::mutex> lock(mutex_);
-    orderBooks_.erase(orderId);
+    orderBooks_.cancelOrder(orderId);
+    // orderBooks_.erase(orderId);
 }
 
 void Stock::printOrderBook() const {
-    std::lock_guard<std::mutex> lock(mutex_);
-    for (const auto& [id, book] : orderBooks_) {
-        book->print();
-    }
+    // for (const auto& [id, book] : orderBooks_) {
+    //     book->print();
+    // }
+    orderBooks_.print();
 }
 
 void Stock::printTradeHistory() const {
-    std::lock_guard<std::mutex> lock(mutex_);
-    for (const auto& [id, book] : orderBooks_) {
-        book->printHistory();
-    }
+    // for (const auto& [id, book] : orderBooks_) {
+    //     book->printHistory();
+    // }
+    orderBooks_.printHistory();
 }
 
 void Stock::startProcessing() {
     Utils::Logger::getInstance().log("Stock processing started.");
-    for (auto& [id, book] : orderBooks_) {
-        book->startProcessing();
-        Utils::Logger::getInstance().log("OrderBook processing started for order: " + boost::uuids::to_string(id));
-    }
+    // for (auto& [id, book] : orderBooks_) {
+    //     book->startProcessing();
+    //     Utils::Logger::getInstance().log("OrderBook processing started for order: " + boost::uuids::to_string(id));
+    // }
+
+    orderBooks_.startProcessing();
 }
 
 void Stock::stopProcessing() {
-    for (auto& [id, book] : orderBooks_) {
-        book->stopProcessing();
-    }
+    // for (auto& [id, book] : orderBooks_) {
+    //     book->stopProcessing();
+    // }
+    orderBooks_.stopProcessing();
 }
 
 }

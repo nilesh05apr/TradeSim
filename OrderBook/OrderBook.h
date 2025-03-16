@@ -33,17 +33,15 @@ public:
     // Query methods
     void print() const;
     void printHistory() const;
+    void processOrders();
 
 private:
     std::priority_queue<Order::Order, std::vector<Order::Order>, Order::OrderComparator> orders_;
     std::unordered_map<boost::uuids::uuid, Order::Order, boost::hash<boost::uuids::uuid>> orderMap_;
     std::vector<Order::Order> tradeHistory_;
-    mutable std::mutex mutex_; // use mutable to allow locking in const methods
-    std::condition_variable cv_;
-    std::atomic<bool> stopProcessing_;
-    std::thread processingThread_;
+//    std::atomic<bool> stopProcessing_ = false;
+    bool stopProcessing_ = false;
 
-    void processOrders();
 };
 
 }

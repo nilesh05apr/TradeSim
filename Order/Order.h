@@ -16,7 +16,8 @@ enum class OrderType {
     CANCEL
 };
 
-struct Order {
+class Order {
+    public:
     boost::uuids::uuid id;
     std::string symbol;
     OrderType type;
@@ -26,6 +27,21 @@ struct Order {
 
     // Default constructor
     Order() : id(boost::uuids::nil_uuid()), type(OrderType::CANCEL), price(0.0), quantity(0) {}
+
+    // Default copy constructor
+    Order(const Order& other) = default;
+
+    // Default destructor
+    ~Order() = default;
+
+    // Move constructor
+    Order(Order&& order) noexcept = default;
+
+    // Copy assignment operator
+    Order& operator=(const Order& other) = default;
+
+    // Move assignment operator
+    Order& operator=(Order&& other) noexcept = default;
 
     Order(const std::string& symbol, OrderType type, double price, int qty)
         : id(boost::uuids::random_generator()()), 

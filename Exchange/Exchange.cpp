@@ -4,11 +4,14 @@
 namespace Exchange {
 
 void Exchange::start() {
+    Utils::Logger::getInstance().log("Exchange started.");
+    if (stocks_.empty()) {
+        throw std::invalid_argument("No stocks listed.");
+    }
     for (auto& [symbol, stock] : stocks_) {
         Utils::Logger::getInstance().log("Starting stock: " + symbol);
         stock->startProcessing();
     }
-    Utils::Logger::getInstance().log("Exchange started.");
 }
 
 void Exchange::stop() {
@@ -36,7 +39,7 @@ void Exchange::placeOrder(const Order::Order& order) {
     try {
         auto& stock = getStock(order.symbol);
         stock->addOrder(order);
-        
+        stock->orderBooks_.startProcessing();
         Utils::Logger::getInstance().log("Order placed: " + boost::uuids::to_string(order.id) + 
                                          " Type: " + Utils::toString(order.type) +
                                          " Price: " + std::to_string(order.price) + 

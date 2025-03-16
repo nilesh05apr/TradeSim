@@ -25,6 +25,9 @@ public:
     double getCurrentMarketPrice() const;
     int getAvailableShares() const;
 
+    //    OrderBook::OrderBook getOrderBook() const;
+    // std::shared_ptr<OrderBook::OrderBook> getOrderBook() const;
+
     // Order handling
     void addOrder(const Order::Order& order);
     void cancelOrder(const boost::uuids::uuid& orderId);
@@ -37,6 +40,10 @@ public:
     void startProcessing();
     void stopProcessing();
 
+    OrderBook::OrderBook orderBooks_;
+    // std::shared_ptr<OrderBook::OrderBook> orderBooks_;
+    // std::unordered_map<boost::uuids::uuid, std::shared_ptr<OrderBook::OrderBook>, boost::hash<boost::uuids::uuid>> orderBooks_;
+
 private:
     boost::uuids::uuid id_;
     std::string symbol_;
@@ -46,8 +53,6 @@ private:
     int availableShares_;
     double currentMarketPrice_;
     std::chrono::time_point<std::chrono::system_clock> listedDate_;
-    mutable std::mutex mutex_;
-    std::unordered_map<boost::uuids::uuid, std::unique_ptr<OrderBook::OrderBook>, boost::hash<boost::uuids::uuid>> orderBooks_;
 };
 
 }

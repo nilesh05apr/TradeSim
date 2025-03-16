@@ -1,6 +1,7 @@
 #include "Exchange/Exchange.h"
 #include "Order/Order.h"
 #include "Utils/Utils.h"
+#include "OrderBook/OrderBook.h"
 #include <thread>
 #include <memory>
 
@@ -20,29 +21,40 @@ int main() {
 
     // Create orders
     try {
-        Order::Order buyOrder1("AAPL", Order::OrderType::LIMIT_BUY, 150.0, 10);
-        Order::Order sellOrder1("AAPL", Order::OrderType::LIMIT_SELL, 150.0, 5);
-        Order::Order marketBuyOrder("AAPL", Order::OrderType::MARKET_BUY, 0.0, 15);
+        // Limit orders
 
-        exchange.placeOrder(buyOrder1);
-        exchange.placeOrder(sellOrder1);
+        Order::Order buyOrder("AAPL", Order::OrderType::LIMIT_BUY, 150.0, 10);
+        Order::Order sellOrder("AAPL", Order::OrderType::LIMIT_SELL, 150.0, 5);
+
+        // Market orders
+        Order::Order marketBuyOrder("AAPL", Order::OrderType::MARKET_BUY, 0.0, 15);
+        Order::Order marketSellOrder("AAPL", Order::OrderType::MARKET_SELL, 0.0, 10);
+
+        // Place orders
+        exchange.placeOrder(buyOrder);
+        exchange.placeOrder(sellOrder);
         exchange.placeOrder(marketBuyOrder);
-        
+        exchange.placeOrder(marketSellOrder);
+
         // Cancel order
-        exchange.cancelOrder(buyOrder1.id);
+        buyOrder.type = Order::OrderType::CANCEL;
+        exchange.placeOrder(buyOrder);
         
     } catch (const std::exception& e) {
         Utils::Logger::getInstance().log("Order creation error: " + std::string(e.what()));
         return 1;
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-
     // Query order book and trade history
-    exchange.getOrderBook("AAPL");
-    exchange.getTradeHistory("AAPL");
+    try {
+        exchange.getOrderBook("AAPL");
+        exchange.getTradeHistory("AAPL");
+    } catch (const std::exception& e) {
+        Utils::Logger::getInstance().log("Error fetching order book or trade history: " + std::string(e.what()));
+        return 1;
+    }
 
-    // Stop exchange processing
+    // Stop exchange processing (stops all stock process threads)
     exchange.stop();
 
     return 0;
