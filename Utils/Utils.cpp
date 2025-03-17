@@ -24,6 +24,26 @@ void Utils::Logger::log(const std::string& message) {
 
 }
 
+void Utils::Logger::info(const std::string& message) {
+    Utils::Logger::getInstance().log("[INFO] " + message);
+}
+
+void Utils::Logger::error(const std::string& message) {
+    Utils::Logger::getInstance().log("[ERROR] " + message);
+}
+
+void Utils::Logger::debug(const std::string& message) {
+    Utils::Logger::getInstance().log("[DEBUG] " + message);
+}
+
+void Utils::Logger::success(const std::string& message) {
+    Utils::Logger::getInstance().log("[SUCCESS] " + message);
+}
+
+void Utils::Logger::warning(const std::string& message) {
+    Utils::Logger::getInstance().log("[WARNING] " + message);
+}
+
 std::string Utils::toString(Order::OrderType type) {
     switch (type) {
         case Order::OrderType::LIMIT_BUY:

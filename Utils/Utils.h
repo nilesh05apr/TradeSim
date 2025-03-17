@@ -12,6 +12,11 @@ namespace Utils {
         public:
         static Logger& getInstance();
         void log(const std::string& message);
+        void info(const std::string& message);
+        void error(const std::string& message);
+        void debug(const std::string& message);
+        void success(const std::string& message);
+        void warning(const std::string& message);
 
         private:
         Logger() {}
@@ -23,6 +28,7 @@ namespace Utils {
     };
 
 std::string toString(Order::OrderType type);
+
 }
 
 #endif // UTILS_H
