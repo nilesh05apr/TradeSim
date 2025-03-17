@@ -8,6 +8,7 @@ void Exchange::start() {
     if (stocks_.empty()) {
         throw std::invalid_argument("No stocks listed.");
     }
+    isRunning = true;
     for (auto& [symbol, stock] : stocks_) {
         Utils::Logger::getInstance().log("Starting stock: " + symbol);
         stock->startProcessing();
@@ -15,6 +16,7 @@ void Exchange::start() {
 }
 
 void Exchange::stop() {
+    isRunning = false;
     for (auto& [symbol, stock] : stocks_) {
         stock->stopProcessing();
     }
@@ -73,4 +75,13 @@ void Exchange::getTradeHistory(const std::string& symbol) const {
     }
 }
 
+std::vector<std::string> Exchange::getStockSymbols() const {
+    std::vector<std::string> symbols;
+    for (const auto& [symbol, stock] : stocks_) {
+        symbols.push_back(symbol);
+    }
+    return symbols;
+
 }
+
+} // namespace Exchange

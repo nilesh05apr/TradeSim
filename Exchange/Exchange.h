@@ -28,8 +28,11 @@ public:
     void getOrderBook(const std::string& symbol) const;
     void getTradeHistory(const std::string& symbol) const;
 
-private:
+    std::vector<std::string> getStockSymbols() const;
+
     std::unordered_map<std::string, std::shared_ptr<Stock::Stock>> stocks_;
+    bool isRunning = false;
+    
 };
 
 }
