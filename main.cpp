@@ -4,6 +4,63 @@
 #include "OrderBook/OrderBook.h"
 #include <thread>
 #include <memory>
+#include <random>
+#include <ctime>
+#include <limits>
+#include <cmath>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
+
+using std::normal_distribution;
+using std::mt19937_64;
+
+
+int current_time_nanoseconds(){
+  struct timespec tm;
+  clock_gettime(CLOCK_REALTIME, &tm);
+  return tm.tv_nsec;
+}
+
+int random_number(int start, int end){
+  boost::random::mt19937_64 mc(current_time_nanoseconds());
+  boost::random::uniform_int_distribution<> udist(start, end);
+  return udist(mc);
+}
+
+float sigma(float x) {
+  return exp(-1 * x) / (1 + exp(-1 * x));
+}
+
+int getRandomOrderType_() {
+  float epsilon = random_number(0, 5);
+  return int(epsilon);
+}
+
+Order::OrderType getRandomOrderType() {
+  int num = getRandomOrderType_();
+
+  switch (num) {
+    case 0:
+      std::cout<< "LIMIT BUY" << std::endl;
+      return Order::OrderType::LIMIT_BUY;
+    case 1:
+      std::cout<< "LIMIT SELL" << std::endl;  
+      return Order::OrderType::LIMIT_SELL;
+    case 2:
+      std::cout<< "MARKET BUY" << std::endl;
+      return Order::OrderType::MARKET_BUY;
+    case 3:
+      std::cout<< "MARKET SELL" <<std::endl;
+      return Order::OrderType::MARKET_SELL;
+    default:
+      std::cout<< "DEFAULT LIMIT ORDER" << std::endl;
+      return Order::OrderType::LIMIT_BUY;
+      break;
+  }
+}
+
 
 int main() {
     Exchange::Exchange exchange;
@@ -56,6 +113,10 @@ int main() {
 
     // Stop exchange processing (stops all stock process threads)
     exchange.stop();
+    
+    Order::OrderType type_ = getRandomOrderType();
+
+    std::cout<< std::to_string(static_cast<int>(type_)) << std::endl;
 
     return 0;
 }

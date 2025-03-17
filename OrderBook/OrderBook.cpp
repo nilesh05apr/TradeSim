@@ -11,12 +11,12 @@ OrderBook::OrderBook() : stopProcessing_(false) {}
 
 void OrderBook::addOrder(const Order::Order& order) {
     Utils::Logger::getInstance().log("Adding order to OrderBook");
-    std::string logMessage = "Order id" 
+    std::string logMessage = "Order id\t" 
                             + boost::uuids::to_string(order.id) 
-                            + "symbol" + order.symbol 
-                            + "type" + std::to_string(static_cast<int>(order.type)) 
-                            + "price" + std::to_string(order.price) 
-                            + "quantity" + std::to_string(order.quantity);
+                            + " symbol\t" + order.symbol 
+                            + " type\t" + std::to_string(static_cast<int>(order.type)) 
+                            + " price\t" + std::to_string(order.price) 
+                            + " quantity\t" + std::to_string(order.quantity);
     Utils::Logger::getInstance().log(logMessage);
     orders_.push(order);
     orderMap_[order.id] = order;
