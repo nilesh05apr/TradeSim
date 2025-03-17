@@ -4,70 +4,63 @@
 
 namespace Stock {
 
-Stock::Stock(const std::string& symbol, const std::string& name, double listedPrice, int totalShares)
-    : id_(boost::uuids::random_generator()()), 
-    symbol_(symbol), 
-    name_(name), 
-    listedPrice_(listedPrice), 
-    totalShares_(totalShares), 
-    availableShares_(totalShares), 
-    currentMarketPrice_(listedPrice), 
-    listedDate_(std::chrono::system_clock::now()) {}
+    Utils::Logger& logger = Utils::Logger::getInstance();
 
-const boost::uuids::uuid& Stock::getId() const { return id_; }
-const std::string& Stock::getSymbol() const { return symbol_; }
-const std::string& Stock::getName() const { return name_; }
-double Stock::getCurrentMarketPrice() const { return currentMarketPrice_; }
-int Stock::getAvailableShares() const { return availableShares_; }
-// std::shared_ptr<OrderBook::OrderBook> Stock::getOrderBook() const { return orderBooks_; }
-// OrderBook::OrderBook Stock::getOrderBook() const { return orderBooks_; }
 
-void Stock::addOrder(const Order::Order& order) {
-    // if (orderBooks_.find(order.id) == orderBooks_.end()) {
-    //     orderBooks_[order.id] = std::make_unique<OrderBook::OrderBook>();
-    // }
-    // orderBooks_[order.id]->addOrder(order);
-    orderBooks_.addOrder(order);
-    Utils::Logger::getInstance().log("Order added: " + boost::uuids::to_string(order.id) + 
-                                     " Type: " + Utils::toString(order.type) +
-                                     " Price: " + std::to_string(order.price) + 
-                                     " Quantity: " + std::to_string(order.quantity));
-}
+    Stock::Stock(const std::string& symbol, const std::string& name, double listedPrice, int totalShares)
+        : id_(boost::uuids::random_generator()()), 
+        symbol_(symbol), 
+        name_(name), 
+        listedPrice_(listedPrice), 
+        totalShares_(totalShares), 
+        availableShares_(totalShares), 
+        currentMarketPrice_(listedPrice), 
+        listedDate_(std::chrono::system_clock::now()) {}
 
-void Stock::cancelOrder(const boost::uuids::uuid& orderId) {
-    orderBooks_.cancelOrder(orderId);
-    // orderBooks_.erase(orderId);
-}
 
-void Stock::printOrderBook() const {
-    // for (const auto& [id, book] : orderBooks_) {
-    //     book->print();
-    // }
-    orderBooks_.print();
-}
+        const boost::uuids::uuid& Stock::getId() const { return id_; }
 
-void Stock::printTradeHistory() const {
-    // for (const auto& [id, book] : orderBooks_) {
-    //     book->printHistory();
-    // }
-    orderBooks_.printHistory();
-}
+        const std::string& Stock::getSymbol() const { return symbol_; }
 
-void Stock::startProcessing() {
-    Utils::Logger::getInstance().log("Stock processing started.");
-    // for (auto& [id, book] : orderBooks_) {
-    //     book->startProcessing();
-    //     Utils::Logger::getInstance().log("OrderBook processing started for order: " + boost::uuids::to_string(id));
-    // }
+        const std::string& Stock::getName() const { return name_; }
 
-    orderBooks_.startProcessing();
-}
+        double Stock::getCurrentMarketPrice() const { return currentMarketPrice_; }
 
-void Stock::stopProcessing() {
-    // for (auto& [id, book] : orderBooks_) {
-    //     book->stopProcessing();
-    // }
-    orderBooks_.stopProcessing();
-}
+        int Stock::getAvailableShares() const { return availableShares_; }
+
+
+        void Stock::addOrder(const Order::Order& order) {
+            orderBooks_.addOrder(order);
+            logger.info("Order added: " + boost::uuids::to_string(order.id) + 
+            " Type: " + Utils::toString(order.type) +
+            " Price: " + std::to_string(order.price) + 
+            " Quantity: " + std::to_string(order.quantity));
+        }
+
+
+        void Stock::cancelOrder(const boost::uuids::uuid& orderId) {
+            logger.warning("Cancelling order: " + boost::uuids::to_string(orderId));
+            orderBooks_.cancelOrder(orderId);
+        }
+
+        void Stock::printOrderBook() const {
+            logger.info("Printing order book for " + symbol_);
+            orderBooks_.print();
+        }
+
+        void Stock::printTradeHistory() const {
+            logger.info("Printing trade history for " + symbol_);
+            orderBooks_.printHistory();
+        }
+
+        void Stock::startProcessing() {
+            logger.debug("Stock processing started.");
+            orderBooks_.startProcessing();
+        }
+
+        void Stock::stopProcessing() {
+            logger.warning("Stock processing stopped.");
+            orderBooks_.stopProcessing();
+        }
 
 }

@@ -3,85 +3,92 @@
 
 namespace Exchange {
 
-void Exchange::start() {
-    Utils::Logger::getInstance().log("Exchange started.");
-    if (stocks_.empty()) {
-        throw std::invalid_argument("No stocks listed.");
-    }
-    isRunning = true;
-    for (auto& [symbol, stock] : stocks_) {
-        Utils::Logger::getInstance().log("Starting stock: " + symbol);
-        stock->startProcessing();
-    }
-}
+    Utils::Logger& logger = Utils::Logger::getInstance();
 
-void Exchange::stop() {
-    isRunning = false;
-    for (auto& [symbol, stock] : stocks_) {
-        stock->stopProcessing();
+    void Exchange::start() {
+        logger.info("Exchange started.");
+        if (stocks_.empty()) {
+            logger.error("No stocks listed.");
+            throw std::invalid_argument("No stocks listed.");
+        }
+        isRunning = true;
+        for (auto& [symbol, stock] : stocks_) {
+            logger.info("Starting process for stock: " + symbol);
+            stock->startProcessing();
+        }
     }
-    Utils::Logger::getInstance().log("Exchange stopped.");
-}
 
-void Exchange::listStock(const std::string& symbol, const std::string& name, double listedPrice, int totalShares) {
-    if (stocks_.find(symbol) != stocks_.end()) {
-        throw std::invalid_argument("Stock already listed.");
+    void Exchange::stop() {
+        isRunning = false;
+        for (auto& [symbol, stock] : stocks_) {
+            stock->stopProcessing();
+        }
+        logger.warning("Exchange stopped.");
     }
-    stocks_[symbol] = std::make_shared<Stock::Stock>(symbol, name, listedPrice, totalShares);
-}
 
-std::shared_ptr<Stock::Stock>& Exchange::getStock(const std::string& symbol) {
-    if (stocks_.find(symbol) == stocks_.end()) {
-        throw std::invalid_argument("Stock not found.");
+    void Exchange::listStock(const std::string& symbol, const std::string& name, double listedPrice, int totalShares) {
+        if (stocks_.find(symbol) != stocks_.end()) {
+            logger.error("Stock already listed.");
+            throw std::invalid_argument("Stock already listed.");
+        }
+        stocks_[symbol] = std::make_shared<Stock::Stock>(symbol, name, listedPrice, totalShares);
+        logger.success("Stock listed: " + symbol);
     }
-    return stocks_[symbol];
-}
 
-void Exchange::placeOrder(const Order::Order& order) {
-    try {
-        auto& stock = getStock(order.symbol);
-        stock->addOrder(order);
-        stock->orderBooks_.startProcessing();
-        Utils::Logger::getInstance().log("Order placed: " + boost::uuids::to_string(order.id) + 
-                                         " Type: " + Utils::toString(order.type) +
-                                         " Price: " + std::to_string(order.price) + 
-                                         " Quantity: " + std::to_string(order.quantity));
-    } catch (const std::exception& e) {
-        Utils::Logger::getInstance().log("Failed to place order: " + std::string(e.what()));
+    std::shared_ptr<Stock::Stock>& Exchange::getStock(const std::string& symbol) {
+        if (stocks_.find(symbol) == stocks_.end()) {
+            throw std::invalid_argument("Stock not found.");
+        }
+        return stocks_[symbol];
     }
-}
 
-void Exchange::cancelOrder(const boost::uuids::uuid& orderId) {
-    for (auto& [symbol, stock] : stocks_) {
-        stock->cancelOrder(orderId);
+    void Exchange::placeOrder(const Order::Order& order) {
+        try {
+            auto& stock = getStock(order.symbol);
+            stock->addOrder(order);
+            stock->orderBooks_.startProcessing();
+            logger.debug("Order placed: " + boost::uuids::to_string(order.id) + 
+                                            " Type: " + Utils::toString(order.type) +
+                                            " Price: " + std::to_string(order.price) + 
+                                            " Quantity: " + std::to_string(order.quantity));
+        } catch (const std::exception& e) {
+            logger.error("Failed to place order: " + std::string(e.what()));
+        }
     }
-}
 
-void Exchange::getOrderBook(const std::string& symbol) const {
-    try {
-        auto& stock = stocks_.at(symbol);
-        stock->printOrderBook();
-    } catch (const std::exception& e) {
-        Utils::Logger::getInstance().log("Failed to get order book: " + std::string(e.what()));
+    void Exchange::cancelOrder(const boost::uuids::uuid& orderId) {
+        logger.warning("Cancelling order: " + boost::uuids::to_string(orderId));
+        for (auto& [symbol, stock] : stocks_) {
+            stock->cancelOrder(orderId);
+        }
     }
-}
 
-void Exchange::getTradeHistory(const std::string& symbol) const {
-    try {
-        auto& stock = stocks_.at(symbol);
-        stock->printTradeHistory();
-    } catch (const std::exception& e) {
-        Utils::Logger::getInstance().log("Failed to get trade history: " + std::string(e.what()));
+    void Exchange::getOrderBook(const std::string& symbol) const {
+        try {
+            auto& stock = stocks_.at(symbol);
+            stock->printOrderBook();
+        } catch (const std::exception& e) {
+            logger.error("Failed to get order book: " + std::string(e.what()));
+        }
     }
-}
 
-std::vector<std::string> Exchange::getStockSymbols() const {
-    std::vector<std::string> symbols;
-    for (const auto& [symbol, stock] : stocks_) {
-        symbols.push_back(symbol);
+    void Exchange::getTradeHistory(const std::string& symbol) const {
+        try {
+            auto& stock = stocks_.at(symbol);
+            stock->printTradeHistory();
+        } catch (const std::exception& e) {
+            logger.error("Failed to get trade history: " + std::string(e.what()));
+        }
     }
-    return symbols;
 
-}
+    std::vector<std::string> Exchange::getStockSymbols() const {
+        logger.debug("Getting stock symbols.");
+        std::vector<std::string> symbols;
+        for (const auto& [symbol, stock] : stocks_) {
+            symbols.push_back(symbol);
+        }
+        return symbols;
+
+    }
 
 } // namespace Exchange

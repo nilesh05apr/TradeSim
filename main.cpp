@@ -12,7 +12,6 @@
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-
 using std::normal_distribution;
 using std::mt19937_64;
 
@@ -63,13 +62,16 @@ Order::OrderType getRandomOrderType() {
 
 
 int main() {
+  
+    Utils::Logger& logger = Utils::Logger::getInstance();
+
     Exchange::Exchange exchange;
 
     // List stock
     try {
         exchange.listStock("AAPL", "Apple Inc.", 150.0, 1000000);
     } catch (const std::exception& e) {
-        Utils::Logger::getInstance().log("Stock listing error: " + std::string(e.what()));
+        logger.error("Stock listing error: " + std::string(e.what()));
         return 1;
     }
 
@@ -98,7 +100,7 @@ int main() {
         exchange.placeOrder(buyOrder);
         
     } catch (const std::exception& e) {
-        Utils::Logger::getInstance().log("Order creation error: " + std::string(e.what()));
+        logger.error("Order creation error: " + std::string(e.what()));
         return 1;
     }
 
@@ -107,7 +109,7 @@ int main() {
         exchange.getOrderBook("AAPL");
         exchange.getTradeHistory("AAPL");
     } catch (const std::exception& e) {
-        Utils::Logger::getInstance().log("Error fetching order book or trade history: " + std::string(e.what()));
+        logger.error("Error fetching order book or trade history: " + std::string(e.what()));
         return 1;
     }
 
